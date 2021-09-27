@@ -1,23 +1,17 @@
-[![Go Reference](https://pkg.go.dev/badge/github.com/vjeantet/grok.svg)](https://pkg.go.dev/github.com/vjeantet/grok)
-[![Build Status](https://travis-ci.org/vjeantet/grok.svg)](https://travis-ci.org/vjeantet/grok)
-[![Coverage Status](https://coveralls.io/repos/vjeantet/grok/badge.png?branch=master)](https://coveralls.io/r/vjeantet/grok?branch=master)
-[![Go Report Card](http://goreportcard.com/badge/vjeantet/grok)](http:/goreportcard.com/report/vjeantet/grok)
-[![Documentation Status](https://readthedocs.org/projects/grok-lib-for-golang/badge/?version=latest)](https://readthedocs.org/projects/grok-lib-for-golang/?badge=latest)
-
-
 # grok
-A simple library to parse grok patterns with Go.
+A simple library to parse grok patterns with Go. Forked from 
+[vjeantet/grok](https://github.com/vjeantet/grok).
 
 # Installation
 Make sure you have a working Go environment.
 
 ```sh
-go get github.com/vjeantet/grok
+go get github.com/occamshub-dev/grok
 ```
 
 # Use in your project
 ```go
-import "github.com/vjeantet/grok"
+import "github.com/occamshub-dev/grok"
 ```
 
 # Usage
@@ -45,7 +39,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/vjeantet/grok"
+	"github.com/occamshub-dev/grok"
 )
 
 func main() {
@@ -94,7 +88,7 @@ package main
 import (
   "fmt"
 
-  "github.com/vjeantet/grok"
+  "github.com/occamshub-dev/grok"
 )
 
 func main() {

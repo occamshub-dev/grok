@@ -3,6 +3,7 @@ package grok
 import (
 	"bufio"
 	"fmt"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -135,6 +136,16 @@ func TestAddPattern(t *testing.T) {
 	g.AddPattern(name+"2", pattern)
 	if len(g.patterns) != cPatterns+2 {
 		t.Fatalf("%d NamedCapture patterns should be available, have %d", cPatterns+2, len(g.patterns))
+	}
+}
+
+func TestGetRawPatterns(t *testing.T) {
+	g, _ := New()
+	rawPatterns := g.GetRawPatterns()
+	rawPatterns["LOREM"] = "IPSUM"
+	rawPatterns["WORD"] = ""
+	if reflect.DeepEqual(rawPatterns, g.rawPattern) {
+		t.Fatalf("GetRawPatterns should return patterns safely")
 	}
 }
 

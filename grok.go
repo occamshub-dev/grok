@@ -26,6 +26,7 @@ type Config struct {
 	RemoveEmptyValues   bool
 	PatternsDir         []string
 	Patterns            map[string]string
+	Unsafe              bool
 }
 
 // Grok object us used to load patterns and deconstruct strings using those
@@ -94,7 +95,16 @@ func NewWithConfig(config *Config) (*Grok, error) {
 	return g, nil
 }
 
-// AddPattern adds a new pattern to the list of loaded patterns.
+// GetRawPatterns returns raw patterns for this instance in a secure form
+func (g *Grok) GetRawPatterns() map[string]string {
+	pats := make(map[string]string)
+	for k, v := range g.rawPattern {
+		pats[k] = v
+	}
+	return pats
+}
+
+// addPattern adds a new pattern to the list of loaded patterns.
 func (g *Grok) addPattern(name, pattern string) error {
 	dnPattern, ti, err := g.denormalizePattern(pattern, g.patterns)
 	if err != nil {
@@ -302,7 +312,28 @@ func (g *Grok) buildPatterns() error {
 	return g.addPatternsFromMap(g.rawPattern)
 }
 
-func (g *Grok) compile(pattern string) (*gRegexp, error) {
+func (g *Grok) compileUnsafe(pattern string) (*gRegexp, error) {
+	gr, ok := g.compiledPatterns[pattern]
+	if ok {
+		return gr, nil
+	}
+
+	newPattern, ti, err := g.denormalizePattern(pattern, g.patterns)
+	if err != nil {
+		return nil, err
+	}
+
+	compiledRegex, err := regexp.Compile(newPattern)
+	if err != nil {
+		return nil, err
+	}
+	gr = &gRegexp{regexp: compiledRegex, typeInfo: ti}
+
+	g.compiledPatterns[pattern] = gr
+	return gr, nil
+}
+
+func (g *Grok) compileSafe(pattern string) (*gRegexp, error) {
 	g.compiledGuard.RLock()
 	gr, ok := g.compiledPatterns[pattern]
 	g.compiledGuard.RUnlock()
@@ -329,6 +360,14 @@ func (g *Grok) compile(pattern string) (*gRegexp, error) {
 	g.compiledGuard.Unlock()
 
 	return gr, nil
+}
+
+func (g *Grok) compile(pattern string) (*gRegexp, error) {
+	if (g.config.Unsafe) {
+		return g.compileUnsafe(pattern)
+	} else {
+		return g.compileSafe(pattern)
+	}
 }
 
 func (g *Grok) denormalizePattern(pattern string, storedPatterns map[string]*gPattern) (string, semanticTypes, error) {
